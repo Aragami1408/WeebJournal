@@ -12,6 +12,7 @@ import com.weebindustry.weebjournal.repositories.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.*;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -51,15 +52,15 @@ public class UserController {
 
 
     @PostMapping("/login")
-    public ResponseEntity<User> loginValidation(@Valid @RequestBody UserLoginDTO dto) {
-        Optional<User> result = repo.loginValidation(dto.getUsername(), dto.getPassword());
+    public ResponseEntity<String> loginValidation(@RequestParam String username, @RequestParam String password) {
+        Optional<User> result = repo.loginValidation(username, password);
 
-        if(!result.isPresent()) {
-            log.error("Login failed from user: {}", dto.getUsername());
-            ResponseEntity.badRequest().build();
+        if (!result.isPresent()) {
+            log.error("Logged in failed from user with username = {}", username);
+            return ResponseEntity.notFound().build();
         }
-        
-        return ResponseEntity.ok(result.get());
+
+        return ResponseEntity.ok("Logged in as " + username);
     }
 
     @PostMapping("/register")
