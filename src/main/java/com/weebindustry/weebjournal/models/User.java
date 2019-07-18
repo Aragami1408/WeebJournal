@@ -2,9 +2,9 @@ package com.weebindustry.weebjournal.models;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Set;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -22,20 +22,21 @@ import lombok.*;
 @Entity
 @Table(name = "users")
 @JsonIgnoreProperties(value = {"password"})
-public class User implements Serializable{
+public class User {
 
-    private static final long serialVersionUID = -8544233980065788815L;
+    
 
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "user_id")
     private Long id;
 
-    @NotBlank
+    
     @Column(name = "username")
     private String username;
 
-    @NotBlank
+    
     @Column(name = "password")
     private String password;
 
@@ -54,5 +55,8 @@ public class User implements Serializable{
 
     @Column(name="date_of_birth")
     private Date dateOfBirth;
+
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    private Set<Post> posts;
     
 }

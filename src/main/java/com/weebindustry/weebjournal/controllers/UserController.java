@@ -2,6 +2,7 @@ package com.weebindustry.weebjournal.controllers;
 
 import java.util.List;
 import java.util.Optional;
+import java.net.*;
 
 import javax.validation.Valid;
 
@@ -12,8 +13,7 @@ import com.weebindustry.weebjournal.repositories.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.*;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -36,18 +36,15 @@ public class UserController {
 
         Optional<User> result = repo.findById(id);
 
-        if (!result.isPresent()) {
-            log.error("Id {} is not existed", id);
-            ResponseEntity.badRequest().build();
-        }
-
-        return ResponseEntity.ok(result.get());
+        return result.map(response -> ResponseEntity.ok().body(response)).orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
 
     @PostMapping("/")
-    public ResponseEntity<User> createUser(@Valid @RequestBody User user) {
-        return ResponseEntity.ok(repo.save(user));
+    public ResponseEntity<User> createUser(@Valid @RequestBody User user) throws URISyntaxException {
+        log.info("Request to create user: {}", user);
+        User result = repo.save(user);
+        return ResponseEntity.created(new URI("/users/" + result.getId())).body(result);
     }
 
 
@@ -80,16 +77,18 @@ public class UserController {
 
     @PutMapping("/{id}")
     public ResponseEntity<User> update(@PathVariable Long id, @Valid @RequestBody User user) {
-        if (!repo.findById(id).isPresent()) {
-            log.error("Id #{} is not existed", id);
-            ResponseEntity.badRequest().build();
+        Optional<User> result = repo.findById(id);
+
+        if (!result.isPresent()) {
+            log.error("User not found with id {}", id);
+            return ResponseEntity.notFound().build();
         }
 
-        return ResponseEntity.ok(repo.save(user));
+        return ResponseEntity.ok().body(repo.save(result.get()));
     }
 
     @DeleteMapping("/users/{id}")
-    public ResponseEntity<?> deleteUser(@PathVariable(value = "id") Long id) {
+    public ResponseEntity<?> deleteUser(@PathVariable Long id) {
        if (!repo.findById(id).isPresent()) {
            log.error("ID {} is not existed!", "id");
            ResponseEntity.badRequest().build();
