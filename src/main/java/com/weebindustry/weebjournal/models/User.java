@@ -2,6 +2,7 @@ package com.weebindustry.weebjournal.models;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.*;
@@ -24,12 +25,9 @@ import lombok.*;
 @JsonIgnoreProperties(value = {"password"})
 public class User {
 
-    
-
-
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "user_id")
+    @Column(name = "id")
     private Long id;
 
     
@@ -56,7 +54,18 @@ public class User {
     @Column(name="date_of_birth")
     private Date dateOfBirth;
 
-    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @Column(name = "role_id")
+    private int roleId;
+
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "users")
     private Set<Post> posts;
+
+    // @ManyToMany(fetch = FetchType.LAZY)
+    // @JoinTable(
+    //         name = "user_role",
+    //         joinColumns = @JoinColumn(name = "user_id"),
+    //         inverseJoinColumns = @JoinColumn(name = "role_id")
+    // )
+    // private Set<Role> roles = new HashSet<>();
     
 }

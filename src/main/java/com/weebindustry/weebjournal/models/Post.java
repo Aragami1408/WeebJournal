@@ -30,11 +30,13 @@ public class Post{
     @Column(name = "date_created")
     private Date dateCreated;
 
+    @Column(name = "votes")
     private int votes;
 
+    @Column(name = "saved")
     private int saved;
 
-    @ManyToOne(cascade = CascadeType.PERSIST)
+    @ManyToOne(fetch = FetchType.LAZY)
     private User users;
     
 }
